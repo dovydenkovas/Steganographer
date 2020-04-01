@@ -5,6 +5,7 @@ Steganography-Cipher-Program.py include functions:
 - read ciphered text from image and uncipher it.
 and run graphical interface from ./data.python.gui.
 """
+
 from os import getcwd
 from os import listdir
 from os import system
