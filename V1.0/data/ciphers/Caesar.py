@@ -1,4 +1,7 @@
-name =  "Шифр Цезаря"
+""" Module consist of cipher and decipher function to (de)ciphering messages C
+"""
+
+name = "Шифр Цезаря"
 
 def cipher(key,string):
     keys = [ord(key[0])]
