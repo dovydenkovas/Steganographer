@@ -1,3 +1,4 @@
+""" Module consist of cipher and decipher function to (de)ciphering messages with Caesar cipher """
 name =  "Шифр Виженера"
 
 def cipher(key,string):

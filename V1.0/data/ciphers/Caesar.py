@@ -1,6 +1,4 @@
-""" Module consist of cipher and decipher function to (de)ciphering messages C
-"""
-
+""" Module consist of cipher and decipher function to (de)ciphering messages with Caesar cipher """
 name = "Шифр Цезаря"
 
 def cipher(key,string):

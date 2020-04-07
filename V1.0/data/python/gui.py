@@ -48,83 +48,11 @@ class MainWindow(QMainWindow):
         self.read_thread = read_thread
         self.write_thread = write_thread
         self.ciphers = ciphers
-        self.t = QTimer()
-        self.t.timeout.connect(self.check_result)
-        self.t.start(500)
-        self.create_window()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.check_result)
+        self.timer.start(500)
 
-    def run(self):
-        self.statusBar().showMessage('Чтение входных данных')
-        text = self.Text.toPlainText()
-        key = self.KeyWorld.text()
-        type = str(self.CipherType.currentText())
-        input = self.FileIn.text()
-        output = self.FileOut.text()
-
-        if len(input) == 0:
-            self.statusBar().showMessage('Предупреждение: Выберите исходное изображение!')
-            return
-
-        if self.button_group.checkedButton().text() == "Шифровать":
-            if len(output) == 0:
-                self.statusBar().showMessage('Предупреждение: Выберите имя конечного изображения!')
-                return
-            if len(text) == 0:
-                self.statusBar().showMessage('Предупреждение: Введите текст сообщения!')
-                return
-            self.statusBar().showMessage('Кодирование...')
-            try:
-                TH = Thread(target=self.write_thread, args=(input, output, text, key, type, self.ciphers, self.statusBar().showMessage))
-                TH.start()
-                TH.join(0)
-            except:
-                self.statusBar().showMessage('Предупреждение: Плохое исходное изображение!')
-        else:
-            self.statusBar().showMessage('Декодирование')
-            try:
-                TH = Thread(target=self.read_thread, args=(input, key, type, self.ciphers, self.statusBar().showMessage, self))
-                TH.start()
-                TH.join(0)
-            except:
-                self.statusBar().showMessage('Предупреждение: Ошика входных данных!')
-
-    def check_result(self):
-        if self.message != None:
-            self.Text.setText(self.message)
-            self.message = None
-
-    def get_output_file(self):
-        if self.button_group.checkedButton().text() == "Шифровать":
-            fname = QFileDialog.getSaveFileName(self, 'Результат', '', "*.png *.jpg")[0]
-        else:
-            fname = QFileDialog.getSaveFileName(self, 'Результат', '', "*")[0]
-        self.FileOut.setText(fname)
-
-    def get_input_file(self):
-        fname = QFileDialog.getOpenFileName(self, 'Входное изображение', '', "*.png *.jpg")[0]
-        self.FileIn.setText(fname)
-
-    def view_tools(self):
-        if self.ControlView:
-            self.ControlFrame.setMaximumWidth(0)
-            self.ControlView = False
-        else:
-            self.ControlFrame.setMaximumWidth(210)
-            self.ControlView = True
-
-    def show_about_info(self):
-        msg = QMessageBox()
-        msg.setIcon(QMessageBox.Information)
-        msg.setWindowTitle("Версия")
-        msg.setText("Стеганограф-Шифратор 1.1")
-        msg.addButton('Понятно', QMessageBox.AcceptRole)
-        msg.exec()
-
-    def show_help(self):
-        """Open help html document"""
-        webbrowser.open(f"{getcwd()}/data/Help/index.html", new=1)
-
-    def create_window(self):
+        # create window
         self.resize(900, 600)
         qr = self.frameGeometry()
         cp = QDesktopWidget().availableGeometry().center()
@@ -135,117 +63,202 @@ class MainWindow(QMainWindow):
         self.statusBar()
         self.setStyleSheet("QLabel,QPushButton,QLineEdit,QComboBox,QRadioButton,QTextEdit {font: 10pt Comic Sans MS}")
 
-        self.win = QWidget(self)
-        self.win.setObjectName("centralWidget")
+        self.window = QWidget(self)
+        self.window.setObjectName("centralWidget")
 
-        # menubar and Create hotkeys
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&Файл')
+        # Create menubar and hotkeys
+        menu_bar = self.menuBar()
+        file_menu_bar = menu_bar.addMenu('&Файл')
 
-        exitAction = QAction(QIcon('data\images\getInputFile.png'), '&Входное изображение', self)
-        exitAction.setShortcut('Ctrl+O')
-        exitAction.setStatusTip(
+        get_input_file_action = QAction('&Входное изображение', self)
+        get_input_file_action.setShortcut('Ctrl+O')
+        get_input_file_action.setStatusTip(
             'Изображение из которого надо прочитать сообщение или в которое надо записать изображение')
-        exitAction.triggered.connect(self.get_input_file)
-        fileMenu.addAction(exitAction)
+        get_input_file_action.triggered.connect(self.get_input_file)
+        file_menu_bar.addAction(get_input_file_action)
 
-        exitAction = QAction(QIcon('data\images\getOutputFile.png'), '&Результат', self)
-        exitAction.setShortcut('Ctrl+S')
-        exitAction.setStatusTip('Имя изображения с сообщением')
-        exitAction.triggered.connect(self.get_output_file)
-        fileMenu.addAction(exitAction)
+        get_output_file_action = QAction('&Результат', self)
+        get_output_file_action.setShortcut('Ctrl+S')
+        get_output_file_action.setStatusTip('Имя изображения с сообщением')
+        get_output_file_action.triggered.connect(self.get_output_file)
+        file_menu_bar.addAction(get_output_file_action)
 
-        fileMenu.addSeparator()
+        file_menu_bar.addSeparator()
 
-        exitAction = QAction(QIcon('exit.png'), '&Выход', self)
-        exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Закрыть приложение')
-        exitAction.triggered.connect(qApp.quit)
-        fileMenu.addAction(exitAction)
+        exit_action = QAction('&Выход', self)
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.setStatusTip('Закрыть приложение')
+        exit_action.triggered.connect(qApp.quit)
+        file_menu_bar.addAction(exit_action)
 
-        fileMenu = menubar.addMenu('&Вид')
-        exitAction = QAction(QIcon('toolbar.png'), '&Показать/Скрыть панель инструментов', self)
-        exitAction.setStatusTip('Вы можете скрыть панель инструментов, в левой части окна')
-        self.ControlView = True
-        exitAction.triggered.connect(self.view_tools)
-        fileMenu.addAction(exitAction)
+        file_menu_bar = menu_bar.addMenu('&Вид')
+        show_tools_action = QAction('&Показать/Скрыть панель инструментов', self)
+        show_tools_action.setStatusTip('Вы можете скрыть панель инструментов, в левой части окна')
+        self.is_view_control = True
+        show_tools_action.triggered.connect(self.view_tools)
+        file_menu_bar.addAction(show_tools_action)
 
-        fileMenu = menubar.addMenu('&Помощь')
-        exitAction = QAction(QIcon('data\images\showHelpWebSite.png'), '&Как пользоваться', self)
-        exitAction.setShortcut('F1')
-        exitAction.setStatusTip('Инструкция по применению приложения')
-        exitAction.triggered.connect(self.show_help)
-        fileMenu.addAction(exitAction)
-        exitAction = QAction(QIcon('data\images\showAboutInfo.png'), '&Версия', self)
-        exitAction.setStatusTip('Версия программы')
-        exitAction.triggered.connect(self.show_about_info)
-        fileMenu.addAction(exitAction)
+        file_menu_bar = menu_bar.addMenu('&Помощь')
+        help_action = QAction('&Как пользоваться', self)
+        help_action.setShortcut('F1')
+        help_action.setStatusTip('Инструкция по применению приложения')
+        help_action.triggered.connect(self.show_help)
+        file_menu_bar.addAction(help_action)
+        exit_action = QAction('&Версия', self)
+        exit_action.setStatusTip('Версия программы')
+        exit_action.triggered.connect(self.show_about_info)
+        file_menu_bar.addAction(exit_action)
 
         # Create toolbar
-        hbox = QHBoxLayout(self.win)
-        self.TextFrame = QFrame(self.win)
-        self.TextFrame.setFrameShape(QFrame.StyledPanel)
-        self.TextL = self.Control = QHBoxLayout(self.TextFrame)
-        self.Text = QTextEdit()
-        self.TextL.addWidget(self.Text)
+        hbox = QHBoxLayout(self.window)
+        self.text_frame = QFrame(self.window)
+        self.text_frame.setFrameShape(QFrame.StyledPanel)
+        self.text_layout = self.control_layout = QHBoxLayout(self.text_frame)
+        self.text = QTextEdit()
+        self.text_layout.addWidget(self.text)
 
-        self.ControlFrame = QFrame(self.win)
-        self.ControlFrame.setFrameShape(QFrame.StyledPanel)
-        self.Control = QVBoxLayout(self.ControlFrame)
+        self.control_frame = QFrame(self.window)
+        self.control_frame.setFrameShape(QFrame.StyledPanel)
+        self.control_layout = QVBoxLayout(self.control_frame)
 
-        self.RadioBTN_Cipher = QRadioButton("Шифровать")
-        self.RadioBTN_UnCipher = QRadioButton("Расшифровать")
-        self.Check = QHBoxLayout()
-        self.Check.addWidget(self.RadioBTN_Cipher)
-        self.Check.addWidget(self.RadioBTN_UnCipher)
-        self.RadioBTN_Cipher.setChecked(True)
+        self.radio_btn_cipher = QRadioButton("Шифровать")
+        self.radio_btn_un_cipher = QRadioButton("Расшифровать")
+        self.select_mode_layout = QHBoxLayout()
+        self.select_mode_layout.addWidget(self.radio_btn_cipher)
+        self.select_mode_layout.addWidget(self.radio_btn_un_cipher)
+        self.radio_btn_cipher.setChecked(True)
         self.button_group = QButtonGroup()
-        self.button_group.addButton(self.RadioBTN_Cipher)
-        self.button_group.addButton(self.RadioBTN_UnCipher)
+        self.button_group.addButton(self.radio_btn_cipher)
+        self.button_group.addButton(self.radio_btn_un_cipher)
 
-        self.labelIn = QLabel("Входное изображение")
-        self.FileInBTN = QPushButton("Выбрать")
-        self.FileInBTN.clicked.connect(self.get_input_file)
-        self.FileInL = QHBoxLayout()
-        self.FileInL.addWidget(self.labelIn)
-        self.FileInL.addWidget(self.FileInBTN)
-        self.FileIn = QLineEdit()
+        self.input_label = QLabel("Входное изображение")
+        self.input_button = QPushButton("Выбрать")
+        self.input_button.clicked.connect(self.get_input_file)
+        self.input_layout = QHBoxLayout()
+        self.input_textedit = QLineEdit()
+        self.input_layout.addWidget(self.input_label)
+        self.input_layout.addWidget(self.input_button)
 
-        self.labelOut = QLabel("Результат")
-        self.FileOutBTN = QPushButton("Выбрать")
-        self.FileOutBTN.clicked.connect(self.get_output_file)
-        self.FileOut = QLineEdit()
-        self.FileOutL = QHBoxLayout()
-        self.FileOutL.addWidget(self.labelOut)
-        self.FileOutL.addWidget(self.FileOutBTN)
+        self.output_label = QLabel("Результат")
+        self.output_button = QPushButton("Выбрать")
+        self.output_button.clicked.connect(self.get_output_file)
+        self.output_textedit = QLineEdit()
+        self.output_layout = QHBoxLayout()
+        self.output_layout.addWidget(self.output_label)
+        self.output_layout.addWidget(self.output_button)
 
-        self.labelCipherType = QLabel("Выберите тип шифрования")
-        self.CipherType = QComboBox()
-        self.CipherType.addItems(map(lambda a: a.name, self.ciphers))
-        self.labelKeyWorld = QLabel("Введите ключ шифрования")
-        self.KeyWorld = QLineEdit()
-        self.runBTN = QPushButton("Выполнить")
-        self.runBTN.clicked.connect(self.run)
+        self.cipher_type_label = QLabel("Выберите тип шифрования")
+        self.cipher_types = QComboBox()
+        self.cipher_types.addItems(map(lambda a: a.name, self.ciphers))
+        self.password_label = QLabel("Введите ключ шифрования")
+        self.password_textedit = QLineEdit()
+        self.run_button = QPushButton("Выполнить")
+        self.run_button.clicked.connect(self.run)
 
-        self.ControlFrame.setMaximumWidth(280)
-        self.Control.addLayout(self.Check)
-        self.Control.addLayout(self.FileInL)
-        self.Control.addWidget(self.FileIn)
-        self.Control.addLayout(self.FileOutL)
-        self.Control.addWidget(self.FileOut)
-        self.Control.addWidget(self.labelCipherType)
-        self.Control.addWidget(self.CipherType)
-        self.Control.addWidget(self.labelKeyWorld)
-        self.Control.addWidget(self.KeyWorld)
-        self.Control.addWidget(self.runBTN)
-        self.Control.setSpacing(15)
-        self.Control.addStretch(1)
+        self.control_frame.setMaximumWidth(280)
+        self.control_layout.addLayout(self.select_mode_layout)
+        self.control_layout.addLayout(self.input_layout)
+        self.control_layout.addWidget(self.input_textedit)
+        self.control_layout.addLayout(self.output_layout)
+        self.control_layout.addWidget(self.output_textedit)
+        self.control_layout.addWidget(self.cipher_type_label)
+        self.control_layout.addWidget(self.cipher_types)
+        self.control_layout.addWidget(self.password_label)
+        self.control_layout.addWidget(self.password_textedit)
+        self.control_layout.addWidget(self.run_button)
+        self.control_layout.setSpacing(15)
+        self.control_layout.addStretch(1)
         self.splitter = QSplitter(Qt.Horizontal)
-        self.splitter.addWidget(self.ControlFrame)
-        self.splitter.addWidget(self.TextFrame)
+        self.splitter.addWidget(self.control_frame)
+        self.splitter.addWidget(self.text_frame)
 
         hbox.addWidget(self.splitter)
-        self.win.setLayout(hbox)
-        self.setCentralWidget(self.win)
+        self.window.setLayout(hbox)
+        self.setCentralWidget(self.window)
 
         self.show()
+
+    def run(self):
+        """
+        Run function is started when pressed run button.
+        This function check input data and
+        start thread with ciphering or deciphering function.
+        """
+        self.statusBar().showMessage('Чтение входных данных')
+        text = self.text.toPlainText()
+        key = self.password_textedit.text()
+        cipher_type = str(self.cipher_types.currentText())
+        infile = self.input_textedit.text()
+        output = self.output_textedit.text()
+
+        # check fail input data
+        if len(infile) == 0:
+            self.statusBar().showMessage('Предупреждение: Выберите исходное изображение!')
+            return
+
+        if self.button_group.checkedButton().text() == "Шифровать":
+            if len(output) == 0:
+                self.statusBar().showMessage('Предупреждение: Выберите имя конечного изображения!')
+            elif len(text) == 0:
+                self.statusBar().showMessage('Предупреждение: Введите текст сообщения!')
+            else:  # if input data is correct
+                self.statusBar().showMessage('Кодирование...')
+                try:
+                    thread = Thread(target=self.write_thread, args=(
+                                    infile, output, text, key, cipher_type,
+                                    self.ciphers, self.statusBar().showMessage))
+                    thread.start()
+                    thread.join(0)
+                except:
+                    self.statusBar().showMessage('Предупреждение: Плохое исходное изображение!')
+        else:  # if deciphering
+            self.statusBar().showMessage('Декодирование')
+            try:
+                thread = Thread(target=self.read_thread,
+                                args=(infile, key, cipher_type, self.ciphers, self.statusBar().showMessage, self))
+                thread.start()
+                thread.join(0)
+            except:
+                self.statusBar().showMessage('Предупреждение: Ошика входных данных!')
+
+    def check_result(self):
+        """
+            start every 0.5 sec. Check result. if message is ready, insert it in textbox.
+        """
+        if self.message is not None:
+            self.text.setText(self.message)
+            self.message = None
+
+    def get_output_file(self):
+        """ Select output file dialog """
+        if self.button_group.checkedButton().text() == "Шифровать":
+            filename = QFileDialog.getSaveFileName(self, 'Результат', '', "*.png *.jpg")[0]
+        else:
+            filename = QFileDialog.getSaveFileName(self, 'Результат', '', "*")[0]
+        self.output_textedit.setText(filename)
+
+    def get_input_file(self):
+        """ Select input file dialog """
+        filename = QFileDialog.getOpenFileName(self, 'Входное изображение', '', "*.png *.jpg")[0]
+        self.input_textedit.setText(filename)
+
+    def view_tools(self):
+        """ show or hide tools menu (left menu) """
+        if self.is_view_control:
+            self.control_frame.setMaximumWidth(0)
+        else:
+            self.control_frame.setMaximumWidth(300)
+        self.is_view_control = not self.is_view_control
+
+    def show_about_info(self):
+        """ Show info message with version of program """
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setWindowTitle("Версия")
+        msg.setText("Стеганограф-Шифратор 1.1")
+        msg.addButton('Понятно', QMessageBox.AcceptRole)
+        msg.exec()
+
+    def show_help(self):
+        """Open help html document"""
+        webbrowser.open(f"{getcwd()}/data/Help/index.html", new=1)
