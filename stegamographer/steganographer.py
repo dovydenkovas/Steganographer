@@ -1,10 +1,29 @@
+# This file is part of Steganographer project.
+#
+# Copyright 2021 The Steganographer contributors
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 """
-Steganography-Cipher-Program.py include functions:
-- loading files who include algorithm ciphers (from ./data/ciphers).
-- cipher text and write it in image.
-- read ciphered text from image and uncipher it.
-and run graphical interface from ./data.python.gui.
+    Steganography-Cipher-Program.py include functions:
+    - loading files who include algorithm ciphers (from ./data/ciphers).
+    - cipher text and write it in image.
+    - read ciphered text from image and uncipher it.
+    and run graphical interface from ./data.python.gui.
 """
+
 
 from os import getcwd
 from os import listdir
@@ -12,8 +31,6 @@ from os import system
 import platform
 import sys
 from importlib import import_module as module
-
-import cv2
 
 import data.python.gui as gui
 import data.python.u2b as u2b
@@ -37,6 +54,9 @@ def write_image(infile, outfile, text, key, cipher_type, ciphers, show_info):
         ShowInfo - statusbar widget.
     cipher text and write it in image.
     """
+
+    import cv2
+
     # cipher text
     for cipher in ciphers:
         if cipher.name == cipher_type:
@@ -87,6 +107,9 @@ def read_image(infile, key, cipher_type, ciphers, show_info, win):
         ShowInfo - statusbar widget.
     cipher text and write it in image.
     """
+
+    import cv2
+
     # What stop symbols?
     for cipher in ciphers:
         if cipher.name == cipher_type:

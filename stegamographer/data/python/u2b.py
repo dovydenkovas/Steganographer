@@ -1,8 +1,26 @@
-""" Translate unicode string or byte string to list of bits
+# This file is part of Steganographer project.
+#
+# Copyright 2021 The Steganographer contributors
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
- unicode2bit(string)  - function to translate unicode string or bite string to bit list;
- bit2unicode(bytes_list) -  function to translate bit list to unicode string.
 
+"""
+    Translate unicode string or byte string to list of bits
+
+    unicode2bit(string)  - function to translate unicode string or bite string to bit list;
+    bit2unicode(bytes_list) -  function to translate bit list to unicode string.
 """
 
 
@@ -33,5 +51,3 @@ def bit2unicode(bits: list):
         b += 16
         string += chr(s // 2)
     return string
-
-
