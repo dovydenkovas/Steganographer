@@ -119,15 +119,15 @@ class MainWindow(QMainWindow):
         file_menu_bar.addAction(show_tools_action)
 
         file_menu_bar = menu_bar.addMenu('&Помощь')
-        help_action = QAction('&Как пользоваться', self)
-        help_action.setShortcut('F1')
+        help_action = QAction('&Лицензия', self)
         help_action.setStatusTip('Инструкция по применению приложения')
-        help_action.triggered.connect(self.show_help)
+        help_action.triggered.connect(self.show_licese)
         file_menu_bar.addAction(help_action)
-        exit_action = QAction('&Версия', self)
-        exit_action.setStatusTip('Версия программы')
-        exit_action.triggered.connect(self.show_about_info)
-        file_menu_bar.addAction(exit_action)
+        about_action = QAction('&О программе', self)
+        about_action.setStatusTip('Краткое описание')
+        about_action.setShortcut('F1')
+        about_action.triggered.connect(self.show_about_info)
+        file_menu_bar.addAction(about_action)
 
         # Create toolbar
         hbox = QHBoxLayout(self.window)
@@ -274,11 +274,11 @@ class MainWindow(QMainWindow):
         """ Show info message with version of program """
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
-        msg.setWindowTitle("Версия")
-        msg.setText("Стеганограф-Шифратор 1.1")
+        msg.setWindowTitle("О программе")
+        msg.setText("Стеганограф-Шифратор 1.1\nПрограмма для стеганографии сообщений\nЛицензия: GNU GPL 3")
         msg.addButton('Понятно', QMessageBox.AcceptRole)
-        msg.exec()
+        msg.exec_()
 
-    def show_help(self):
+    def show_licese(self):
         """Open help html document"""
-        webbrowser.open(f"{getcwd()}/data/Help/index.html", new=1)
+        webbrowser.open(f"{getcwd()}/data/LICENSE.txt", new=1)
