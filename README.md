@@ -1,5 +1,4 @@
-# Steganography-Cipher-Program
-
+# Steganographer
 ## Description
 This program can cipher your message and steganography it in png or jpg image.
 
