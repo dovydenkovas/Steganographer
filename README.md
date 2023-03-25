@@ -1,6 +1,6 @@
 # Steganographer
 ## Description
-This program can cipher your message and steganography it in png or jpg image.
+This program can cipher your message and steganography it in png image.
 
 ## Features
 * Read and write text messages from images
